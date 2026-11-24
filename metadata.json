@@ -1,0 +1,6 @@
+{
+  "name": "Spotify Vibe Match & Premium",
+  "description": "음악 성향 설문을 통해 나만의 맞춤 장르를 발견하고, 스포티파이 프리미엄의 특별한 혜택을 만나보세요.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

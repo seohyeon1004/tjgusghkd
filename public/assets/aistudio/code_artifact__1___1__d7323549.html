@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Your Vibe | Spotify Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        spBlack: '#000000',
+                        spDark: '#121212',
+                        spGray: '#282828',
+                        spLightGray: '#b3b3b3',
+                        spGreen: '#1DB954',
+                        spGreenHover: '#1ed760',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Noise Texture Overlay */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Hero Background Orbs */
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 50%, #191414 0%, #000000 100%);
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: float 12s infinite alternate ease-in-out;
+            opacity: 0.4;
+        }
+        .orb-1 {
+            width: 50vw; height: 50vw;
+            background-color: #1DB954;
+            top: -10%; left: -10%;
+        }
+        .orb-2 {
+            width: 40vw; height: 40vw;
+            background-color: #d8b4e2; /* Pastel purple for ILLIT vibe */
+            bottom: -10%; right: -10%;
+            animation-delay: -6s;
+        }
+        .orb-3 {
+            width: 35vw; height: 35vw;
+            background-color: #ffb6c1; /* Soft pink for Y2K vibe */
+            top: 20%; right: 10%;
+            animation: float 15s infinite alternate-reverse ease-in-out;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(10vw, 10vh) scale(1.2); }
+        }
+
+        /* Parallax Album Collage Background (Using Unsplash URL) */
+        .album-bg {
+            position: fixed;
+            top: -20px; left: -20px; right: -20px; bottom: -20px;
+            /* Record store/Album collage alternative image */
+            background-image: url('https://images.unsplash.com/photo-1619983081563-430f53602796?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center 0;
+            opacity: 0.15;
+            filter: blur(8px);
+            z-index: -1;
+            pointer-events: none;
+            will-change: background-position;
+        }
+
+        /* Giant Typography */
+        .hero-text {
+            font-size: clamp(3.5rem, 10vw, 12rem);
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 10;
+            position: relative;
+            text-align: center;
+            word-break: keep-all;
+            animation: magicalGlowFloat 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes magicalGlowFloat {
+            0% { transform: translateY(0); filter: drop-shadow(0 0 15px rgba(29, 185, 84, 0.2)); }
+            100% { transform: translateY(-10px); filter: drop-shadow(0 0 40px rgba(216, 180, 226, 0.6)); }
+        }
+
+        /* Heartbeat Pulse Button */
+        .btn-pulse {
+            transition: all 0.3s ease;
+        }
+        .btn-pulse:hover {
+            animation: heartbeat 1.2s infinite ease-in-out;
+            box-shadow: 0 0 40px rgba(29, 185, 84, 0.4);
+            background-color: #1ed760;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.05); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Bento Box Layout */
+        .bento-item {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.4s ease, border-color 0.4s ease;
+            background-color: #121212;
+            border-radius: 2rem;
+        }
+        .bento-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(29, 185, 84, 0.5);
+        }
+        .bento-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 0;
+        }
+        .bento-item:hover .bento-bg {
+            transform: scale(1.08); /* Hover Scale Effect */
+        }
+        .bento-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+        .bento-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Pricing Card Glow */
+        .pricing-card {
+            background-color: #181818;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: #1DB954;
+            box-shadow: 0 20px 40px -10px rgba(29, 185, 84, 0.15);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #282828; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #1DB954; }
+    </style>
+</head>
+<body class="antialiased selection:bg-spGreen selection:text-black">
+
+    <!-- Parallax Background Element -->
+    <div class="album-bg"></div>
+    <div class="noise"></div>
+
+    <!-- Minimal Header / Hamburger -->
+    <header class="fixed top-0 w-full z-40 p-6 flex justify-between items-center mix-blend-difference">
+        <div class="text-white font-bold text-xl tracking-tighter flex items-center gap-2 cursor-pointer">
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.54.659.28 1.021zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15.001 10.62 18.66 12.84c.361.181.54.78.301 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.42-1.02.599-1.559.3z"/></svg>
+            Spotify
+        </div>
+        <button class="w-12 h-12 flex flex-col justify-center items-end gap-2 group">
+            <span class="block w-8 h-[2px] bg-white transition-all group-hover:w-10"></span>
+            <span class="block w-6 h-[2px] bg-white transition-all group-hover:w-10"></span>
+        </button>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex flex-col justify-center items-center px-4 overflow-hidden pt-20">
+        <div class="hero-bg">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+        
+        <div class="z-10 mb-6 inline-flex items-center gap-2 px-5 py-2 rounded-full border border-spGreen/40 bg-black/40 text-white text-sm font-bold tracking-widest backdrop-blur-md reveal">
+            <span class="w-2 h-2 rounded-full bg-spGreen animate-pulse"></span>
+            Spotify x ILLIT
+        </div>
+
+        <h1 class="hero-text font-black z-10 select-none">
+            음악으로<br>이어지는 우리
+        </h1>
+        
+        <p class="z-10 mt-8 text-spLightGray text-lg md:text-2xl font-medium tracking-wide text-center max-w-2xl reveal">
+            서로를 끌어당기는 마그네틱한 취향,<br>스포티파이에서 발견하다.
+        </p>
+        
+        <div class="z-10 mt-12 reveal" style="transition-delay: 0.2s;">
+            <a href="#pricing" class="btn-pulse inline-block bg-spGreen text-black font-bold text-lg py-4 px-10 rounded-full">
+                1개월 무료 체험하기
+            </a>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 z-10 animate-bounce flex flex-col items-center opacity-50">
+            <span class="text-xs tracking-widest uppercase mb-2">Scroll</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </div>
+    </section>
+
+    <!-- Bento Grid (Premium Features) -->
+    <section class="py-32 px-6 max-w-7xl mx-auto relative z-10" id="features">
+        <div class="mb-20 text-center reveal">
+            <h2 class="text-4xl md:text-6xl font-bold tracking-tight mb-4">왜 프리미엄인가요?</h2>
+            <p class="text-spLightGray text-lg">음악의 흐름을 끊지 않는 완벽한 몰입의 경험.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]">
+            <!-- 1. Ad-free (Large) -->
+            <div class="bento-item md:col-span-2 md:row-span-2 p-10 reveal group">
+                <div class="bento-bg" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('tkwls.png'); background-size: cover; background-position: center;"></div>
+                <div class="bento-overlay"></div>
+                <div class="bento-content">
+                    <div>
+                        <h3 class="text-3xl md:text-5xl font-bold mb-4 drop-shadow-md">광고 없는<br>음악 감상.</h3>
+                        <p class="text-white/90 text-lg max-w-sm drop-shadow-sm">중간에 끊기는 일 없이 좋아하는 아티스트의 앨범을 끝까지 완벽하게 즐기세요.</p>
+                    </div>
+                    <!-- Abstract visual representation of wave -->
+                    <div class="absolute -right-20 -bottom-20 opacity-30 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none">
+                        <svg width="400" height="400" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                          <path fill="#1DB954" d="M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.3,-46.3C90.8,-33.5,96.8,-18,95.5,-3.1C94.2,11.8,85.6,26.1,75.1,37.8C64.6,49.5,52.2,58.6,38.9,65.8C25.6,73,11.4,78.3,-3.3,83C-18,87.7,-32.8,91.8,-45.7,85.7C-58.6,79.6,-69.6,63.3,-77.4,47.4C-85.2,31.5,-89.8,16,-88.4,1.1C-87,-13.8,-79.6,-28.1,-69.5,-39.4C-59.4,-50.7,-46.6,-59,-33.6,-66.2C-20.6,-73.4,-7.4,-79.5,6.5,-90.9C20.4,-102.3,30.6,-83.6,44.7,-76.4Z" transform="translate(100 100)" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Offline - Solo Performer/K-pop Vibe Background -->
+            <div class="bento-item p-8 reveal" style="transition-delay: 0.1s;">
+                <!-- Using Unsplash public URL for energetic performer -->
+                <div class="bento-bg" style="background-image: url('https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=800&auto=format&fit=crop');"></div>
+                <div class="bento-overlay"></div>
+                <div class="bento-content justify-end">
+                    <svg class="w-12 h-12 text-spGreen mb-auto drop-shadow-md" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 drop-shadow-md">오프라인 저장</h3>
+                        <p class="text-white/80 text-sm drop-shadow-sm">데이터 걱정 없이 언제 어디서나 감상하세요.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Unlimited Skips -->
+            <div class="bento-item p-8 reveal" style="transition-delay: 0.2s;">
+                <div class="bento-bg" style="background-image: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800&auto=format&fit=crop');"></div>
+                <div class="bento-overlay"></div>
+                <div class="bento-content justify-end">
+                    <svg class="w-12 h-12 text-spGreen mb-auto drop-shadow-md" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062A1.125 1.125 0 013 16.81V8.688zM12.75 8.688c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062a1.125 1.125 0 01-1.683-.977V8.688z"></path></svg>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2 drop-shadow-md">무제한 건너뛰기</h3>
+                        <p class="text-white/80 text-sm drop-shadow-sm">원하는 곡만 선택해서 듣는 완전한 자유.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. High Audio Quality -->
+            <div class="bento-item md:col-span-3 p-10 reveal" style="transition-delay: 0.3s;">
+                <div class="bento-bg" style="background-image: url('https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1600&auto=format&fit=crop'); background-position: center 40%;"></div>
+                <div class="bento-overlay" style="background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.1) 100%);"></div>
+                <div class="bento-content flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                    <div class="max-w-xl">
+                        <h3 class="text-3xl font-bold mb-3 drop-shadow-md">최고급 오디오 퀄리티</h3>
+                        <p class="text-white/90 drop-shadow-sm text-lg">디테일이 살아있는 스튜디오급 사운드로 플레이리스트의 격을 높이세요.</p>
+                    </div>
+                    <div class="flex items-end gap-1.5 h-16 hidden sm:flex">
+                        <!-- Audio equalizer animation effect via CSS -->
+                        <div class="w-3 bg-spGreen rounded-t-sm h-full animate-[pulse_1s_ease-in-out_infinite_alternate]"></div>
+                        <div class="w-3 bg-spGreen rounded-t-sm h-3/4 animate-[pulse_0.8s_ease-in-out_infinite_alternate]"></div>
+                        <div class="w-3 bg-spGreen rounded-t-sm h-1/2 animate-[pulse_1.2s_ease-in-out_infinite_alternate]"></div>
+                        <div class="w-3 bg-spGreen rounded-t-sm h-5/6 animate-[pulse_0.9s_ease-in-out_infinite_alternate]"></div>
+                        <div class="w-3 bg-spGreen rounded-t-sm h-2/3 animate-[pulse_1.5s_ease-in-out_infinite_alternate]"></div>
+                        <div class="w-3 bg-spGreen rounded-t-sm h-full animate-[pulse_1.1s_ease-in-out_infinite_alternate]"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Pricing Section -->
+    <section class="py-32 px-6 relative z-10 bg-spDark" id="pricing">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 reveal">
+                <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">당신에게 맞는 요금제</h2>
+                <p class="text-spLightGray text-lg">언제든 해지할 수 있습니다.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Individual -->
+                <div class="pricing-card rounded-3xl p-8 flex flex-col reveal" style="transition-delay: 0s;">
+                    <span class="inline-block bg-spGreen text-black text-xs font-bold px-3 py-1 rounded-full mb-6 w-max">1개월 무료</span>
+                    <h3 class="text-2xl font-bold mb-2">개인(Individual)</h3>
+                    <p class="text-spLightGray mb-6 border-b border-spGray pb-6">10,900원/월<br>계정 1개</p>
+                    <ul class="text-sm space-y-4 flex-1 mb-8">
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>광고 없는 음악 감상</li>
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>오프라인 감상</li>
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>나만의 맞춤형 플레이리스트</li>
+                    </ul>
+                    <button class="w-full py-3 rounded-full bg-transparent border-2 border-white font-bold hover:bg-white hover:text-black transition-colors">시작하기</button>
+                </div>
+
+                <!-- Duo -->
+                <div class="pricing-card rounded-3xl p-8 flex flex-col reveal" style="transition-delay: 0.1s;">
+                    <span class="inline-block bg-spGreen text-black text-xs font-bold px-3 py-1 rounded-full mb-6 w-max">1개월 무료</span>
+                    <h3 class="text-2xl font-bold mb-2">듀오(Duo)</h3>
+                    <p class="text-spLightGray mb-6 border-b border-spGray pb-6">16,350원/월<br>계정 2개</p>
+                    <ul class="text-sm space-y-4 flex-1 mb-8">
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>동거인을 위한 프리미엄 계정 2개</li>
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>함께 듣는 듀오 믹스 제공</li>
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>각자의 계정에서 무제한 감상</li>
+                    </ul>
+                    <button class="w-full py-3 rounded-full bg-transparent border-2 border-white font-bold hover:bg-white hover:text-black transition-colors">시작하기</button>
+                </div>
+
+                <!-- Family (Highlight) -->
+                <div class="pricing-card rounded-3xl p-8 flex flex-col reveal relative overflow-hidden" style="transition-delay: 0.2s; border-color: rgba(29,185,84,0.5);">
+                    <div class="absolute top-0 right-0 bg-spGreen text-black text-[10px] font-bold px-3 py-1 rounded-bl-lg">BEST VALUE</div>
+                    <span class="inline-block bg-spGreen text-black text-xs font-bold px-3 py-1 rounded-full mb-6 w-max mt-2">1개월 무료</span>
+                    <h3 class="text-2xl font-bold mb-2 text-spGreen">가족(Family)</h3>
+                    <p class="text-spLightGray mb-6 border-b border-spGray pb-6">17,900원/월<br>최대 계정 6개</p>
+                    <ul class="text-sm space-y-4 flex-1 mb-8">
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>가족을 위한 프리미엄 계정 6개</li>
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>자녀를 위한 Spotify Kids 앱</li>
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>유해 콘텐츠 차단 기능</li>
+                    </ul>
+                    <button class="btn-pulse w-full py-3 rounded-full bg-spGreen text-black font-bold">시작하기</button>
+                </div>
+
+                <!-- Student -->
+                <div class="pricing-card rounded-3xl p-8 flex flex-col reveal" style="transition-delay: 0.3s;">
+                    <span class="inline-block bg-spGreen text-black text-xs font-bold px-3 py-1 rounded-full mb-6 w-max">1개월 무료</span>
+                    <h3 class="text-2xl font-bold mb-2">학생(Student)</h3>
+                    <p class="text-spLightGray mb-6 border-b border-spGray pb-6">5,900원/월<br>계정 1개</p>
+                    <ul class="text-sm space-y-4 flex-1 mb-8">
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>인증된 대학생을 위한 반값 할인</li>
+                        <li class="flex gap-3"><svg class="w-5 h-5 text-spGreen flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>개인(Individual) 혜택 모두 포함</li>
+                    </ul>
+                    <button class="w-full py-3 rounded-full bg-transparent border-2 border-white font-bold hover:bg-white hover:text-black transition-colors">시작하기</button>
+                </div>
+            </div>
+            <p class="text-xs text-spLightGray mt-8 text-center reveal">무료 체험 종료 후 정기결제가 시작됩니다. 약관이 적용됩니다. 대학생 인증이 필요할 수 있습니다.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-20 px-6 border-t border-spGray">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div class="font-bold text-3xl tracking-tighter flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="36" height="36" fill="#1DB954"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.54.659.28 1.021zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15.001 10.62 18.66 12.84c.361.181.54.78.301 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.38 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.42-1.02.599-1.559.3z"/></svg>
+                Spotify
+            </div>
+            <ul class="flex flex-wrap gap-6 text-sm font-medium text-spLightGray">
+                <li class="hover:text-spGreen cursor-pointer transition-colors">법률 정보</li>
+                <li class="hover:text-spGreen cursor-pointer transition-colors">개인정보 보호 센터</li>
+                <li class="hover:text-spGreen cursor-pointer transition-colors">개인정보 처리방침</li>
+                <li class="hover:text-spGreen cursor-pointer transition-colors">쿠키</li>
+            </ul>
+        </div>
+    </footer>
+
+    <!-- Vanilla JS for Scroll Animation -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const reveals = document.querySelectorAll(".reveal");
+
+            const revealOnScroll = () => {
+                const windowHeight = window.innerHeight;
+                const elementVisible = 100;
+                const scrolled = window.scrollY;
+
+                reveals.forEach((reveal) => {
+                    const elementTop = reveal.getBoundingClientRect().top;
+                    if (elementTop < windowHeight - elementVisible) {
+                        reveal.classList.add("active");
+                    }
+                });
+
+                // Parallax effect for album background
+                const albumBg = document.querySelector('.album-bg');
+                if (albumBg) {
+                    // 스크롤 속도보다 느리게 배경이 움직이도록 설정
+                    albumBg.style.backgroundPosition = `center ${scrolled * -0.25}px`;
+                }
+            };
+
+            window.addEventListener("scroll", revealOnScroll);
+            // Trigger once on load
+            setTimeout(revealOnScroll, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: "Pretendard Variable", "Pretendard", "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.015em;
+    word-break: keep-all;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom Spotify Colors and Utilities */
+:root {
+  --sp-black: #000000;
+  --sp-dark: #121212;
+  --sp-card: #181818;
+  --sp-gray: #282828;
+  --sp-light-gray: #b3b3b3;
+  --sp-green: #1DB954;
+  --sp-green-hover: #1ed760;
+}
+
+/* Noise Texture Overlay */
+.noise {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Hero Background Orbs */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  background: radial-gradient(circle at 50% 50%, #191414 0%, #000000 100%);
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  animation: float 12s infinite alternate ease-in-out;
+  opacity: 0.4;
+}
+
+.orb-1 {
+  width: 50vw; height: 50vw;
+  background-color: #1DB954;
+  top: -10%; left: -10%;
+}
+
+.orb-2 {
+  width: 40vw; height: 40vw;
+  background-color: #d8b4e2; /* Pastel purple for ILLIT vibe */
+  bottom: -10%; right: -10%;
+  animation-delay: -6s;
+}
+
+.orb-3 {
+  width: 35vw; height: 35vw;
+  background-color: #ffb6c1; /* Soft pink for Y2K vibe */
+  top: 20%; right: 10%;
+  animation: float 15s infinite alternate-reverse ease-in-out;
+  opacity: 0.3;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(8vw, 8vh) scale(1.15); }
+}
+
+/* Parallax Album Collage Background */
+.album-bg {
+  position: fixed;
+  top: -20px; left: -20px; right: -20px; bottom: -20px;
+  background-image: url('https://images.unsplash.com/photo-1619983081563-430f53602796?q=80&w=2000&auto=format&fit=crop');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 0;
+  opacity: 0.15;
+  filter: blur(8px);
+  z-index: -1;
+  pointer-events: none;
+  will-change: background-position;
+}
+
+/* Giant Typography */
+.hero-text {
+  font-size: clamp(3rem, 8vw, 7.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.4) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  z-index: 10;
+  position: relative;
+  text-align: center;
+  word-break: keep-all;
+  animation: magicalGlowFloat 4s ease-in-out infinite alternate;
+}
+
+@keyframes magicalGlowFloat {
+  0% { transform: translateY(0); filter: drop-shadow(0 0 15px rgba(29, 185, 84, 0.2)); }
+  100% { transform: translateY(-8px); filter: drop-shadow(0 0 35px rgba(216, 180, 226, 0.5)); }
+}
+
+/* Heartbeat Pulse Button */
+.btn-pulse {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-pulse:hover {
+  animation: heartbeat 1.2s infinite ease-in-out;
+  box-shadow: 0 0 35px rgba(29, 185, 84, 0.45);
+  background-color: #1ed760;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.04); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+/* Bento Box Layout */
+.bento-item {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  background-color: #121212;
+  border-radius: 1.75rem;
+}
+.bento-item:hover {
+  transform: translateY(-4px);
+  border-color: rgba(29, 185, 84, 0.5);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8);
+}
+.bento-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+}
+.bento-item:hover .bento-bg {
+  transform: scale(1.06);
+}
+.bento-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.15) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.bento-content {
+  position: relative;
+  z-index: 10;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Pricing Card Glow */
+.pricing-card {
+  background-color: #181818;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.pricing-card:hover {
+  transform: translateY(-6px);
+  border-color: #1DB954;
+  box-shadow: 0 20px 40px -10px rgba(29, 185, 84, 0.18);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #000000; }
+::-webkit-scrollbar-thumb { background: #282828; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #1DB954; }
